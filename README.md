@@ -7,9 +7,11 @@ Section 2:
 	JDK Version: java version "1.8.0_144"
 
 Section 3 
+
 a)	Sonar lint / EclEmma scan Snapshot 
 b)	Final Output Snapshot 
-c)	Junit Coverage Snapshot : https://github.com/anksngp/assignment_tiaa/blob/master/Coverage.png
+c)	Junit Coverage Snapshot : 
+        ![SonarLint] (https://github.com/anksngp/assignment_tiaa/blob/master/Coverage.png)
 
 Section 4 
 Licensing 
