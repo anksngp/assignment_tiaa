@@ -11,7 +11,7 @@ Section 3
 a)	Sonar lint / EclEmma scan Snapshot 
 b)	Final Output Snapshot 
 c)	Junit Coverage Snapshot : 
-        ![Junit] (Coverage.png)
+        ![Junit](Coverage.png)
 
 Section 4 
 Licensing 
