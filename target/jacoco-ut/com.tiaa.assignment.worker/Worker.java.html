@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Worker.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Conveyor Belt</a> &gt; <a href="index.source.html" class="el_package">com.tiaa.assignment.worker</a> &gt; <span class="el_source">Worker.java</span></div><h1>Worker.java</h1><pre class="source lang-java linenums">package com.tiaa.assignment.worker;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+
+import com.tiaa.assignment.main.exception.ApplicationException;
+import com.tiaa.assignment.model.Bolt;
+import com.tiaa.assignment.model.Machine;
+import com.tiaa.assignment.model.Material;
+import com.tiaa.assignment.model.Output;
+
+public class Worker implements Callable&lt;Output&gt; {
+
+	private BlockingQueue&lt;Material&gt; blockingQueue;
+	private int timeRequiredForCreatingProduct;
+
+<span class="fc" id="L17">	public Worker(BlockingQueue&lt;Material&gt; blockingQueue, int timeRequiredForCreatingProduct) {</span>
+<span class="fc" id="L18">		this.blockingQueue = blockingQueue;</span>
+<span class="fc" id="L19">		this.timeRequiredForCreatingProduct = timeRequiredForCreatingProduct;</span>
+<span class="fc" id="L20">	}</span>
+
+	private void process() throws InterruptedException {
+<span class="fc" id="L23">		Thread.sleep(timeRequiredForCreatingProduct * 1000);</span>
+<span class="fc" id="L24">		System.out.println(&quot;Product Created by &quot; + Thread.currentThread().getName());</span>
+<span class="fc" id="L25">	}</span>
+
+	private void readValuesFrom() {
+<span class="fc" id="L28">		int boltCount = 0;</span>
+<span class="fc" id="L29">		int machineCount = 0;</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">		while (blockingQueue.size() != 0) {</span>
+<span class="pc bpc" id="L31" title="1 of 4 branches missed.">			if (boltCount == 2 &amp;&amp; machineCount == 1) {</span>
+<span class="fc" id="L32">				return;</span>
+			}
+			try {
+<span class="fc" id="L35">				Material token = blockingQueue.peek();</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">				if (token instanceof Machine) {</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">					if (machineCount &lt; 1) {</span>
+<span class="fc" id="L38">						machineCount++;</span>
+<span class="fc" id="L39">						blockingQueue.take();</span>
+					}
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">				} else if (token instanceof Bolt) {</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">					if (boltCount &lt; 2) {</span>
+<span class="fc" id="L43">						boltCount++;</span>
+<span class="fc" id="L44">						blockingQueue.take();</span>
+					}
+				}
+<span class="pc" id="L47">			} catch (InterruptedException e) {</span>
+<span class="nc" id="L48">				throw new ApplicationException(&quot;Thread interrupted&quot;, e);</span>
+			}
+		}
+
+<span class="fc" id="L52">	}</span>
+
+	@Override
+	public Output call() {
+<span class="fc" id="L56">		int productsCreated = 0;</span>
+<span class="fc" id="L57">		int timeTakenByWorker = 0;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		if (null == blockingQueue) {</span>
+<span class="fc" id="L59">			throw new ApplicationException(&quot;No material found&quot;);</span>
+		}
+<span class="fc bfc" id="L61" title="All 2 branches covered.">		while (blockingQueue.size() != 0) {</span>
+			try {
+<span class="fc" id="L63">				readValuesFrom();</span>
+<span class="fc" id="L64">				process();</span>
+<span class="fc" id="L65">				productsCreated++;</span>
+<span class="fc" id="L66">				timeTakenByWorker = timeTakenByWorker + timeRequiredForCreatingProduct;</span>
+
+<span class="pc" id="L68">			} catch (InterruptedException e) {</span>
+<span class="nc" id="L69">				throw new ApplicationException(&quot;Unable to add element to belt&quot;, e);</span>
+			}
+		}
+<span class="fc" id="L72">		return new Output(productsCreated, timeTakenByWorker);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

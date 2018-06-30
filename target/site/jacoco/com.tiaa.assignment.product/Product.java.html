@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Product.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Conveyor Belt</a> &gt; <a href="index.source.html" class="el_package">com.tiaa.assignment.product</a> &gt; <span class="el_source">Product.java</span></div><h1>Product.java</h1><pre class="source lang-java linenums">package com.tiaa.assignment.product;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Assert;
+
+import com.tiaa.assignment.main.exception.ApplicationException;
+import com.tiaa.assignment.model.Bolt;
+import com.tiaa.assignment.model.Machine;
+import com.tiaa.assignment.model.Material;
+import com.tiaa.assignment.model.Output;
+import com.tiaa.assignment.worker.Worker;
+
+<span class="fc" id="L22">public class Product {</span>
+
+	public int createProducts(int totalBolts, int totalMachines, int numberOfWorkers,
+			int timeRequiredForCreatingProduct) {
+<span class="fc" id="L26">		int totalProductsCreated = 0;</span>
+<span class="fc" id="L27">		int maxTimeTaken = 0;</span>
+		try {
+			
+			// Check if items are adequate quantity
+<span class="pc bpc" id="L31" title="1 of 6 branches missed.">			if (totalBolts == 0 || totalMachines == 0 || totalBolts % totalMachines != 0) {</span>
+<span class="fc" id="L32">				return 0;</span>
+			}
+
+			// Initialise list of material
+<span class="fc" id="L36">			BlockingQueue&lt;Material&gt; blockingQueue = new LinkedBlockingQueue&lt;&gt;();</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">			for (int i = 0; i &lt; totalMachines; i++) {</span>
+<span class="fc" id="L38">				blockingQueue.put(new Bolt());</span>
+<span class="fc" id="L39">				blockingQueue.put(new Machine());</span>
+<span class="fc" id="L40">				blockingQueue.put(new Bolt());</span>
+			}
+
+			// Creating worker threads
+<span class="fc" id="L44">			Worker conveyorBelt = new Worker(blockingQueue, timeRequiredForCreatingProduct);</span>
+<span class="fc" id="L45">			ExecutorService executor = Executors.newFixedThreadPool(numberOfWorkers);</span>
+
+<span class="fc" id="L47">			List&lt;Future&lt;Output&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
+			// Submit task to Executor
+<span class="fc bfc" id="L49" title="All 2 branches covered.">			for (int i = 1; i &lt;= numberOfWorkers; i++) {</span>
+<span class="fc" id="L50">				Future&lt;Output&gt; submit = executor.submit(conveyorBelt);</span>
+<span class="fc" id="L51">				futures.add(submit);</span>
+			}
+
+			//Getting result
+<span class="fc bfc" id="L55" title="All 2 branches covered.">			for (Future&lt;Output&gt; f : futures) {</span>
+<span class="fc" id="L56">				Output output = f.get();</span>
+<span class="fc" id="L57">				totalProductsCreated = totalProductsCreated + (output.getProductsCreated());</span>
+<span class="fc" id="L58">				int timetaken = output.getTimetaken();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">				if (timetaken &gt; maxTimeTaken) {</span>
+<span class="fc" id="L60">					maxTimeTaken = timetaken;</span>
+
+				}
+			}
+
+<span class="fc" id="L65">			Assert.assertEquals(6, totalProductsCreated);</span>
+<span class="fc" id="L66">			Assert.assertEquals(2, maxTimeTaken);</span>
+<span class="fc" id="L67">			System.out.println(&quot;Total products created &quot; + totalProductsCreated);</span>
+<span class="fc" id="L68">			System.out.println(&quot;Time taken &quot; + maxTimeTaken);</span>
+
+			// Shutdown Executor
+<span class="fc" id="L71">			executor.shutdown();</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">			if (!executor.awaitTermination(120, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L73">				executor.shutdownNow();</span>
+			}
+<span class="fc" id="L75">			return totalProductsCreated;</span>
+			
+<span class="nc" id="L77">		} catch (InterruptedException | ExecutionException e) {</span>
+<span class="nc" id="L78">			throw new ApplicationException(&quot;Unable to create product&quot;, e);</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
