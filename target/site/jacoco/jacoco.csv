@@ -1,9 +1,8 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Conveyor Belt,com.tiaa.assignment.main.exception,ApplicationException,5,4,0,0,2,2,1,1,1,1
-Conveyor Belt,com.tiaa.assignment.product,Product,10,134,2,14,3,29,2,8,0,2
+Conveyor Belt,com.tiaa.assignment.product,Product,3,126,2,14,1,27,2,8,0,2
 Conveyor Belt,com.tiaa.assignment.model,Bolt,0,3,0,0,0,1,0,1,0,1
-Conveyor Belt,com.tiaa.assignment.model,Material,0,3,0,0,0,1,0,1,0,1
 Conveyor Belt,com.tiaa.assignment.model,Output,0,15,0,0,0,6,0,3,0,3
 Conveyor Belt,com.tiaa.assignment.model,Machine,0,3,0,0,0,1,0,1,0,1
-Conveyor Belt,com.tiaa.assignment.main,Main,3,27,0,2,1,8,1,2,1,1
-Conveyor Belt,com.tiaa.assignment.worker,Worker,14,105,4,14,2,34,4,9,0,4
+Conveyor Belt,com.tiaa.assignment.main,Main,3,20,0,0,1,7,1,1,1,1
+Conveyor Belt,com.tiaa.assignment.worker,Worker,4,105,2,16,1,36,2,13,0,6

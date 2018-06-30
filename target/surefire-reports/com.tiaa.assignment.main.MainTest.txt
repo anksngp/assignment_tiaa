@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.tiaa.assignment.main.MainTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.326 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.223 sec

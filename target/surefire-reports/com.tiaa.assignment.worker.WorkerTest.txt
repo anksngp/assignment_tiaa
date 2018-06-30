@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.tiaa.assignment.worker.WorkerTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.972 sec
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.979 sec

@@ -20,25 +20,21 @@ public class Worker implements Callable<Output> {
 	}
 
 	private void process() throws InterruptedException {
-		Thread.sleep(timeRequiredForCreatingProduct * 1000);
+		Thread.sleep(timeRequiredForCreatingProduct * 1000l);
 	}
 
-	private void readValuesFrom() {
+	private void readValuesFrom() throws InterruptedException {
 		int boltCount = 0;
 		int machineCount = 0;
 		while (!blockingQueue.isEmpty()) {
 			if (boltCount == 2 && machineCount == 1) {
 				return;
 			}
-			try {
-				Material token = blockingQueue.take();
-				if (token instanceof Machine) {
-					machineCount = consumeMachine(machineCount, token);
-				} else if (token instanceof Bolt) {
-					boltCount = consumeBolt(boltCount, token);
-				}
-			} catch (InterruptedException e) {
-				throw new ApplicationException("Thread interrupted", e);
+			Material token = blockingQueue.take();
+			if (token instanceof Machine) {
+				machineCount = consumeMachine(machineCount, token);
+			} else if (token instanceof Bolt) {
+				boltCount = consumeBolt(boltCount, token);
 			}
 		}
 
@@ -63,22 +59,18 @@ public class Worker implements Callable<Output> {
 	}
 
 	@Override
-	public Output call() {
+	public Output call() throws InterruptedException {
 		int productsCreated = 0;
 		int timeTakenByWorker = 0;
 		if (null == blockingQueue) {
 			throw new ApplicationException("No material found");
 		}
 		while (!blockingQueue.isEmpty()) {
-			try {
-				readValuesFrom();
-				process();
-				productsCreated++;
-				timeTakenByWorker = timeTakenByWorker + timeRequiredForCreatingProduct;
+			readValuesFrom();
+			process();
+			productsCreated++;
+			timeTakenByWorker = timeTakenByWorker + timeRequiredForCreatingProduct;
 
-			} catch (InterruptedException e) {
-				throw new ApplicationException("Unable to add element to belt", e);
-			}
 		}
 		return new Output(productsCreated, timeTakenByWorker);
 	}

@@ -20,56 +20,59 @@ public class Worker implements Callable&lt;Output&gt; {
 <span class="fc" id="L20">	}</span>
 
 	private void process() throws InterruptedException {
-<span class="fc" id="L23">		Thread.sleep(timeRequiredForCreatingProduct * 1000);</span>
-<span class="fc" id="L24">		System.out.println(&quot;Product Created by &quot; + Thread.currentThread().getName());</span>
-<span class="fc" id="L25">	}</span>
+<span class="fc" id="L23">		Thread.sleep(timeRequiredForCreatingProduct * 1000l);</span>
+<span class="fc" id="L24">	}</span>
 
-	private void readValuesFrom() {
-<span class="fc" id="L28">		int boltCount = 0;</span>
-<span class="fc" id="L29">		int machineCount = 0;</span>
-<span class="fc bfc" id="L30" title="All 2 branches covered.">		while (blockingQueue.size() != 0) {</span>
-<span class="pc bpc" id="L31" title="1 of 4 branches missed.">			if (boltCount == 2 &amp;&amp; machineCount == 1) {</span>
-<span class="fc" id="L32">				return;</span>
+	private void readValuesFrom() throws InterruptedException {
+<span class="fc" id="L27">		int boltCount = 0;</span>
+<span class="fc" id="L28">		int machineCount = 0;</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">		while (!blockingQueue.isEmpty()) {</span>
+<span class="fc bfc" id="L30" title="All 4 branches covered.">			if (boltCount == 2 &amp;&amp; machineCount == 1) {</span>
+<span class="fc" id="L31">				return;</span>
 			}
-			try {
-<span class="fc" id="L35">				Material token = blockingQueue.peek();</span>
-<span class="fc bfc" id="L36" title="All 2 branches covered.">				if (token instanceof Machine) {</span>
-<span class="pc bpc" id="L37" title="1 of 2 branches missed.">					if (machineCount &lt; 1) {</span>
-<span class="fc" id="L38">						machineCount++;</span>
-<span class="fc" id="L39">						blockingQueue.take();</span>
-					}
-<span class="pc bpc" id="L41" title="1 of 2 branches missed.">				} else if (token instanceof Bolt) {</span>
-<span class="pc bpc" id="L42" title="1 of 2 branches missed.">					if (boltCount &lt; 2) {</span>
-<span class="fc" id="L43">						boltCount++;</span>
-<span class="fc" id="L44">						blockingQueue.take();</span>
-					}
-				}
-<span class="pc" id="L47">			} catch (InterruptedException e) {</span>
-<span class="nc" id="L48">				throw new ApplicationException(&quot;Thread interrupted&quot;, e);</span>
+<span class="fc" id="L33">			Material token = blockingQueue.take();</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">			if (token instanceof Machine) {</span>
+<span class="fc" id="L35">				machineCount = consumeMachine(machineCount, token);</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">			} else if (token instanceof Bolt) {</span>
+<span class="fc" id="L37">				boltCount = consumeBolt(boltCount, token);</span>
 			}
 		}
 
-<span class="fc" id="L52">	}</span>
+<span class="fc" id="L41">	}</span>
+
+	private int consumeBolt(int boltCount, Material token) throws InterruptedException {
+<span class="fc bfc" id="L44" title="All 2 branches covered.">		if (boltCount &lt; 2) {</span>
+<span class="fc" id="L45">			boltCount++;</span>
+<span class="fc" id="L46">		} else {</span>
+<span class="fc" id="L47">			blockingQueue.put(token);</span>
+		}
+<span class="fc" id="L49">		return boltCount;</span>
+	}
+
+	private int consumeMachine(int machineCount, Material token) throws InterruptedException {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">		if (machineCount &lt; 1) {</span>
+<span class="fc" id="L54">			machineCount++;</span>
+<span class="fc" id="L55">		} else {</span>
+<span class="nc" id="L56">			blockingQueue.put(token);</span>
+		}
+<span class="fc" id="L58">		return machineCount;</span>
+	}
 
 	@Override
-	public Output call() {
-<span class="fc" id="L56">		int productsCreated = 0;</span>
-<span class="fc" id="L57">		int timeTakenByWorker = 0;</span>
-<span class="fc bfc" id="L58" title="All 2 branches covered.">		if (null == blockingQueue) {</span>
-<span class="fc" id="L59">			throw new ApplicationException(&quot;No material found&quot;);</span>
+	public Output call() throws InterruptedException {
+<span class="fc" id="L63">		int productsCreated = 0;</span>
+<span class="fc" id="L64">		int timeTakenByWorker = 0;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">		if (null == blockingQueue) {</span>
+<span class="fc" id="L66">			throw new ApplicationException(&quot;No material found&quot;);</span>
 		}
-<span class="fc bfc" id="L61" title="All 2 branches covered.">		while (blockingQueue.size() != 0) {</span>
-			try {
-<span class="fc" id="L63">				readValuesFrom();</span>
-<span class="fc" id="L64">				process();</span>
-<span class="fc" id="L65">				productsCreated++;</span>
-<span class="fc" id="L66">				timeTakenByWorker = timeTakenByWorker + timeRequiredForCreatingProduct;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">		while (!blockingQueue.isEmpty()) {</span>
+<span class="fc" id="L69">			readValuesFrom();</span>
+<span class="fc" id="L70">			process();</span>
+<span class="fc" id="L71">			productsCreated++;</span>
+<span class="fc" id="L72">			timeTakenByWorker = timeTakenByWorker + timeRequiredForCreatingProduct;</span>
 
-<span class="pc" id="L68">			} catch (InterruptedException e) {</span>
-<span class="nc" id="L69">				throw new ApplicationException(&quot;Unable to add element to belt&quot;, e);</span>
-			}
 		}
-<span class="fc" id="L72">		return new Output(productsCreated, timeTakenByWorker);</span>
+<span class="fc" id="L75">		return new Output(productsCreated, timeTakenByWorker);</span>
 	}
 
 }

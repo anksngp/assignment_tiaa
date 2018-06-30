@@ -1,13 +1,13 @@
 package com.tiaa.assignment.main;
 
-import static org.junit.Assert.*;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
 public class MainTest {
 
 	@Test
-	public void testMain()  {
+	public void testMain() throws InterruptedException, ExecutionException  {
 		Main.main(null);
 	}
 

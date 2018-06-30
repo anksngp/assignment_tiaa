@@ -10,73 +10,62 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-
-import com.tiaa.assignment.main.exception.ApplicationException;
 import com.tiaa.assignment.model.Bolt;
 import com.tiaa.assignment.model.Machine;
 import com.tiaa.assignment.model.Material;
 import com.tiaa.assignment.model.Output;
 import com.tiaa.assignment.worker.Worker;
 
-<span class="fc" id="L22">public class Product {</span>
+<span class="fc" id="L19">public class Product {</span>
 
 	public int createProducts(int totalBolts, int totalMachines, int numberOfWorkers,
-			int timeRequiredForCreatingProduct) {
-<span class="fc" id="L26">		int totalProductsCreated = 0;</span>
-<span class="fc" id="L27">		int maxTimeTaken = 0;</span>
-		try {
-			
-			// Check if items are adequate quantity
-<span class="pc bpc" id="L31" title="1 of 6 branches missed.">			if (totalBolts == 0 || totalMachines == 0 || totalBolts % totalMachines != 0) {</span>
-<span class="fc" id="L32">				return 0;</span>
-			}
-
-			// Initialise list of material
-<span class="fc" id="L36">			BlockingQueue&lt;Material&gt; blockingQueue = new LinkedBlockingQueue&lt;&gt;();</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">			for (int i = 0; i &lt; totalMachines; i++) {</span>
-<span class="fc" id="L38">				blockingQueue.put(new Bolt());</span>
-<span class="fc" id="L39">				blockingQueue.put(new Machine());</span>
-<span class="fc" id="L40">				blockingQueue.put(new Bolt());</span>
-			}
-
-			// Creating worker threads
-<span class="fc" id="L44">			Worker conveyorBelt = new Worker(blockingQueue, timeRequiredForCreatingProduct);</span>
-<span class="fc" id="L45">			ExecutorService executor = Executors.newFixedThreadPool(numberOfWorkers);</span>
-
-<span class="fc" id="L47">			List&lt;Future&lt;Output&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
-			// Submit task to Executor
-<span class="fc bfc" id="L49" title="All 2 branches covered.">			for (int i = 1; i &lt;= numberOfWorkers; i++) {</span>
-<span class="fc" id="L50">				Future&lt;Output&gt; submit = executor.submit(conveyorBelt);</span>
-<span class="fc" id="L51">				futures.add(submit);</span>
-			}
-
-			//Getting result
-<span class="fc bfc" id="L55" title="All 2 branches covered.">			for (Future&lt;Output&gt; f : futures) {</span>
-<span class="fc" id="L56">				Output output = f.get();</span>
-<span class="fc" id="L57">				totalProductsCreated = totalProductsCreated + (output.getProductsCreated());</span>
-<span class="fc" id="L58">				int timetaken = output.getTimetaken();</span>
-<span class="fc bfc" id="L59" title="All 2 branches covered.">				if (timetaken &gt; maxTimeTaken) {</span>
-<span class="fc" id="L60">					maxTimeTaken = timetaken;</span>
-
-				}
-			}
-
-<span class="fc" id="L65">			Assert.assertEquals(6, totalProductsCreated);</span>
-<span class="fc" id="L66">			Assert.assertEquals(2, maxTimeTaken);</span>
-<span class="fc" id="L67">			System.out.println(&quot;Total products created &quot; + totalProductsCreated);</span>
-<span class="fc" id="L68">			System.out.println(&quot;Time taken &quot; + maxTimeTaken);</span>
-
-			// Shutdown Executor
-<span class="fc" id="L71">			executor.shutdown();</span>
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">			if (!executor.awaitTermination(120, TimeUnit.SECONDS)) {</span>
-<span class="nc" id="L73">				executor.shutdownNow();</span>
-			}
-<span class="fc" id="L75">			return totalProductsCreated;</span>
-			
-<span class="nc" id="L77">		} catch (InterruptedException | ExecutionException e) {</span>
-<span class="nc" id="L78">			throw new ApplicationException(&quot;Unable to create product&quot;, e);</span>
+			int timeRequiredForCreatingProduct) throws InterruptedException, ExecutionException {
+<span class="fc" id="L23">		int totalProductsCreated = 0;</span>
+<span class="fc" id="L24">		int maxTimeTaken = 0;</span>
+		// Check if items are adequate quantity
+<span class="pc bpc" id="L26" title="1 of 6 branches missed.">		if (totalBolts == 0 || totalMachines == 0 || totalBolts % totalMachines != 0) {</span>
+<span class="fc" id="L27">			return 0;</span>
 		}
+
+		// Initialise list of material
+<span class="fc" id="L31">		BlockingQueue&lt;Material&gt; blockingQueue = new LinkedBlockingQueue&lt;&gt;();</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">		for (int i = 0; i &lt; totalMachines; i++) {</span>
+<span class="fc" id="L33">			blockingQueue.put(new Bolt());</span>
+<span class="fc" id="L34">			blockingQueue.put(new Machine());</span>
+<span class="fc" id="L35">			blockingQueue.put(new Bolt());</span>
+		}
+
+		// Creating worker threads
+<span class="fc" id="L39">		Worker conveyorBelt = new Worker(blockingQueue, timeRequiredForCreatingProduct);</span>
+<span class="fc" id="L40">		ExecutorService executor = Executors.newFixedThreadPool(numberOfWorkers);</span>
+
+<span class="fc" id="L42">		List&lt;Future&lt;Output&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
+		// Submit task to Executor
+<span class="fc bfc" id="L44" title="All 2 branches covered.">		for (int i = 1; i &lt;= numberOfWorkers; i++) {</span>
+<span class="fc" id="L45">			Future&lt;Output&gt; submit = executor.submit(conveyorBelt);</span>
+<span class="fc" id="L46">			futures.add(submit);</span>
+		}
+
+		// Getting result
+<span class="fc bfc" id="L50" title="All 2 branches covered.">		for (Future&lt;Output&gt; f : futures) {</span>
+<span class="fc" id="L51">			Output output = f.get();</span>
+<span class="fc" id="L52">			totalProductsCreated = totalProductsCreated + (output.getProductsCreated());</span>
+<span class="fc" id="L53">			int timetaken = output.getTimetaken();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">			if (timetaken &gt; maxTimeTaken) {</span>
+<span class="fc" id="L55">				maxTimeTaken = timetaken;</span>
+
+			}
+		}
+
+<span class="fc" id="L60">		System.out.println(&quot;Total products created &quot; + totalProductsCreated);</span>
+<span class="fc" id="L61">		System.out.println(&quot;Time taken &quot; + maxTimeTaken);</span>
+
+		// Shutdown Executor
+<span class="fc" id="L64">		executor.shutdown();</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">		if (!executor.awaitTermination(120, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L66">			executor.shutdownNow();</span>
+		}
+<span class="fc" id="L68">		return totalProductsCreated;</span>
 	}
 
 }
